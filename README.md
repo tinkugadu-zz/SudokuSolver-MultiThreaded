@@ -17,3 +17,10 @@ If the puzzle is solved, puzzle solved message is displayed and displays a compl
 If the puzzle is not solved yet, incomplete puzzle with possible answers for every cell is displayed.
 
 Feel free to modify and share this tool. Happy solving!!
+
+Release version 2:
+Moved Cell class from SudokuClass to SudokuCell.
+changed compilation script to cmake and deleted make.sh file.
+Usage: Create folder named buid. cd into build directory and type "cmake .."
+This command will compile all cpp files of project and creates an executable 
+
