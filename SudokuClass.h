@@ -22,6 +22,8 @@ class SudokuClass
                 std::queue<std::pair<uint, uint>> *inds);
     static void threadFillUniqueValues(uint thr_id, traversal opt, std::vector<Cell> *cells,
                 std::queue<std::pair<uint, uint>> *inds);
+    static void threadPairPossibles(uint thr_id, traversal opt, std::vector<Cell> *cells,
+                std::queue<std::pair<uint, uint>> *inds);
     SudokuClass() = delete;
     void fixRemainingCells(std::queue<std::pair<uint, uint>> &indices);
 public:
@@ -36,7 +38,8 @@ public:
     bool validateRows(bool checkComplete=false, int row = -1);
     bool validateColumns(bool checkComplete=false, int col= -1);
     bool validateZones(bool checkComplete=false, int zone= -1);
-    void fillUniqueValues(traversal opt); 
+    void fillUniqueValues(traversal opt);
+    void pairPossibles(traversal opt);
 };
 
 #endif //SUDOKUCLASS_H

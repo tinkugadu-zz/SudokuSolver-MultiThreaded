@@ -1,5 +1,6 @@
 #include "SudokuClass.h"
 #include <map>
+#include <algorithm>
 
 
 //SudokuClass definitin starts here
@@ -98,7 +99,7 @@ void SudokuClass::fillPossibleCells(traversal opt)
     {
         it.join();
     }
-    fixRemainingCells(indices);
+    if(indices.size()) fixRemainingCells(indices);
     cout<<"possible values are fixed"<<endl;
 }
 
@@ -379,7 +380,7 @@ void SudokuClass::fillUniqueValues(traversal opt)
         cout<<"unique values thread is complete"<<endl;
     }
 
-    fixRemainingCells(indices);
+    if(indices.size()) fixRemainingCells(indices);
     cout<<"unique values filled"<<endl;
 }
 
@@ -448,3 +449,144 @@ void SudokuClass::threadFillUniqueValues(uint thr_id, traversal opt, std::vector
         }
     }
 }
+
+
+void SudokuClass::pairPossibles(traversal opt)
+{
+    std::vector<std::thread> threads;
+    std::queue<std::pair<uint, uint>> indices;
+
+    for(auto i=0; i<_size; ++i)
+    {
+        threads.push_back(std::thread(SudokuClass::threadPairPossibles, i, opt,
+                        &_cells, &indices));
+    }
+
+    for(auto &it:threads)
+    {
+        it.join();
+        cout<<"pair possibles thread is complete"<<endl;
+    }
+
+    if(indices.size()) fixRemainingCells(indices);
+    cout<<"paired possibles"<<endl;
+}
+
+void SudokuClass::threadPairPossibles(uint id, traversal opt, std::vector<Cell> *cells,
+                                    std::queue<std::pair<uint, uint>> *inds)
+{
+    if(!cells || !inds) 
+    {
+        //error checks please
+        printMutex.lock();
+        cout<<"@ thread: "<<id<<" cell vector or indices vector is passed empty"<<endl;
+        printMutex.unlock();
+        return;
+    }
+    uint row_st = 0;
+    uint row_end = 0;
+    uint col_st = 0;
+    uint col_end = 0;
+    uint  size = (uint)sqrt((double)cells->size());
+    uint sqSize = (uint)sqrt((double)size);
+    if(opt == ROW)
+    {
+        row_st = id;
+        row_end = id;
+        col_st = 0;
+        col_end = size-1;
+    }
+    else if(opt == COL)
+    {
+        row_st = 0;
+        row_end = size-1;
+        col_st = id;
+        col_end = id;
+    }
+    else if(opt == ZONE)
+    {
+        uint rq = id/sqSize;
+        uint cm = id%sqSize;
+        row_st = sqSize*rq;
+        row_end = row_st + sqSize-1;
+        col_st = sqSize*cm;
+        col_end = col_st + sqSize-1;
+    }
+
+    //create a map of possible values to indices that has same possible value vector
+    //for now, we are going to create a vector of that pair and inefficiently traverse through every
+    //to actually fill map
+    std::vector< std::pair<std::vector<uint>, std::vector<uint> > > pairMap;
+    auto insertFunc = [](vector<pair<vector<uint>, vector<uint> > > &myMap, 
+                        vector<uint> &possib, uint ind){
+
+            //comparator function for 2 vectors
+                auto compFunc = [](vector<uint> &vec1, vector<uint> &vec2)
+                {
+                    if (vec1.size() != vec2.size()) return false;
+                    for(auto i=0; i<vec1.size(); ++i)
+                    {
+                        if(vec1[i] != vec2[i]) return false;
+                    }
+                    return true;
+                }; //nested lambda function end
+
+                for(auto &it: myMap)
+                {
+                    if(compFunc(it.first, possib))
+                    {
+                        it.second.push_back(ind);
+                        return;
+                    }
+                }
+            //if reached her, then possib vector is not compared to any other pair 
+        //in pairMap. So insert new one
+                std::vector<uint> vecInd;
+                vecInd.push_back(ind);
+                myMap.push_back(pair<vector<uint>, vector<uint>>(possib, vecInd));
+                //end of lambdda function                                                
+                }; //lambda function end
+    for(auto ii=row_st; ii<= row_end; ++ii)
+    {
+        for(auto jj = col_st; jj <= col_end; ++jj)
+        {
+            //if pairMap is empty just enter the possible pair with indices
+            uint cellInd = ii*size+jj;
+            if(!(*cells)[cellInd].isEmpty()) continue;
+            auto cellPossibles = (*cells)[cellInd].getPossibleValues();
+            if(cellPossibles.size() > sqSize) continue;
+            //if reached here, update pairMap with possibles and indices
+            insertFunc(pairMap, cellPossibles, cellInd);
+        }
+    }
+
+
+    //once pairMap is built, check if any of the pair has same multiple indices and remove
+        //them ffrom other cells
+    for(auto &it: pairMap)
+    {
+        if(it.first.size() != it.second.size()) continue;
+            //remove those possibles from all indices
+        for(auto ii=row_st; ii<=row_end; ++ii)
+        {
+            for(auto jj=col_st; jj<=col_end; ++jj)
+            {
+                uint cellInd = ii*size + jj;
+                if (!(*cells)[cellInd].isEmpty()) continue;
+                if(std::find(it.second.begin(), it.second.end(), cellInd) == 
+                            it.second.end())
+                {
+                 //didnt find this index in indicws vector, so remove possibles from 
+                 //this cellInd
+                    for(auto &possibIt:it.first)
+                    {
+                        if((*cells)[cellInd].removePossibleValue(possibIt))
+                            inds->push(std::pair<uint, uint>(ii, jj));
+                    }
+                }
+            }
+        }
+    }
+
+}
+

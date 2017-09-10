@@ -32,6 +32,7 @@ public:
     uint getColId();
     void dump();
     std::vector<uint> getPossibleValues();
+    bool operator == (Cell &rhs);
 };
 
 #endif  //SUDOKUCELL_H

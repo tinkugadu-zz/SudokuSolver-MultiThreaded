@@ -131,9 +131,9 @@ int main(int argc, char* argv[])
     else
         cout<<"puzzle is not solved"<<endl;
 //next step is to find numbers which only appear in one of the possible cell.
-    mySudoku.fillUniqueValues(ROW);
-    mySudoku.fillUniqueValues(COL);
-    mySudoku.fillUniqueValues(ZONE);
+    mySudoku.pairPossibles(ROW);
+    mySudoku.pairPossibles(COL);
+    mySudoku.pairPossibles(ZONE);
     if(mySudoku.complete())
     {
         cout<<"puzzle is solved"<<endl;
@@ -145,9 +145,22 @@ int main(int argc, char* argv[])
         cout<<"puzzle is not solved"<<endl;
     }
 
-    mySudoku.dump();
 //this step is to find identical possible pairs within row, col, zone and 
 //eliminate them as possible values in neighboring empty cells
+    mySudoku.fillUniqueValues(ROW);
+    mySudoku.fillUniqueValues(COL);
+    mySudoku.fillUniqueValues(ZONE);
+
+    if(mySudoku.complete())
+    {
+        cout<<"puzzle is solved"<<endl;
+        mySudoku.dump();
+        exit(0);
+    } else
+    {
+        cout<<"puzzle is not solved yet"<<endl;
+    }
+    mySudoku.dump();
 
     return 0;
 }

@@ -113,3 +113,29 @@ std::vector<uint> Cell::getPossibleValues()
     return retVect;
 }
 
+bool Cell::operator ==(Cell &rhs)
+{
+    //if non-empty values match, return true.
+    if(!this->isEmpty() && !rhs.isEmpty() && this->value == rhs.getVal())
+    {
+        return true;
+    }
+
+    //if reached here, then possiblities should match.
+    auto possibVect = rhs.getPossibleValues();
+    cout<<"this length: "<<(this->possibles).size()<<endl;
+    cout<<"rhs legth: "<<possibVect.size()<<endl;
+    if((this->possibles).size() != possibVect.size())
+    {
+        return false;
+    }
+    //seems like both lengths are same
+    auto ind = 0;
+    for(auto &it: this->possibles)
+    {
+        if(it != possibVect[ind]) return false;
+        ++ind;
+    }
+    //if reached here, then both arrays seems to be same
+    return true;
+}
