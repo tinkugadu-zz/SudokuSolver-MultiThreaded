@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
         {
             sstream>>tmp;
             tmpRow.push_back(tmp);
-            cout<<"tmp value : "<<tmp<<endl;
+//            cout<<"tmp value : "<<tmp<<endl;
             ++ind;
         }
         if(tmpRow.size() != puzzlesize)
@@ -130,36 +130,44 @@ int main(int argc, char* argv[])
     }
     else
         cout<<"puzzle is not solved"<<endl;
-//next step is to find numbers which only appear in one of the possible cell.
-    mySudoku.pairPossibles(ROW);
-    mySudoku.pairPossibles(COL);
-    mySudoku.pairPossibles(ZONE);
-    if(mySudoku.complete())
-    {
-        cout<<"puzzle is solved"<<endl;
-        mySudoku.dump();
-        exit(0);
-    }
-    else
-    {
-        cout<<"puzzle is not solved"<<endl;
-    }
 
+    auto iter = 0;
+    while(mySudoku.isPuzzleChanged())
+    {
+        mySudoku.reset();
+        ++iter;        
 //this step is to find identical possible pairs within row, col, zone and 
 //eliminate them as possible values in neighboring empty cells
-    mySudoku.fillUniqueValues(ROW);
-    mySudoku.fillUniqueValues(COL);
-    mySudoku.fillUniqueValues(ZONE);
+        mySudoku.pairPossibles(ROW);
+        mySudoku.pairPossibles(COL);
+        mySudoku.pairPossibles(ZONE);
+        if(mySudoku.complete())
+        {
+            cout<<"puzzle is solved"<<endl;
+            //mySudoku.dump();
+            break;
+        }
+        else
+        {
+            cout<<"puzzle is not solved"<<endl;
+        }
 
-    if(mySudoku.complete())
-    {
-        cout<<"puzzle is solved"<<endl;
-        mySudoku.dump();
-        exit(0);
-    } else
-    {
-        cout<<"puzzle is not solved yet"<<endl;
+//next step is to find numbers which only appear in one of the possible cell.
+        mySudoku.fillUniqueValues(ROW);
+        mySudoku.fillUniqueValues(COL);
+        mySudoku.fillUniqueValues(ZONE);
+
+        if(mySudoku.complete())
+        {
+            cout<<"puzzle is solved"<<endl;
+            //mySudoku.dump();
+            break;
+        } else
+        {
+            cout<<"puzzle is not solved yet"<<endl;
+        }
     }
+    cout<<"Total iterations: "<<iter<<endl;
     mySudoku.dump();
 
     return 0;

@@ -6,7 +6,8 @@
 //SudokuClass definitin starts here
 std::mutex SudokuClass::printMutex;
 SudokuClass::SudokuClass(uint size): 
-        _size(size), _cells(std::vector<Cell>()), _sqSize(0)
+        _size(size), _cells(std::vector<Cell>()), _sqSize(0),
+        isChanged(false)
 {
     if(size == 0)
     {
@@ -122,6 +123,7 @@ void SudokuClass::fixRemainingCells(std::queue<std::pair<uint, uint>> &inds)
             if(_cells[row_id*_size + jj].removePossibleValue(cellVal))
             {
                 inds.push(std::pair<uint, uint>(row_id, jj));
+                set();
             }
         }
         //fix column possibles, traverse through all rows for this column
@@ -131,6 +133,7 @@ void SudokuClass::fixRemainingCells(std::queue<std::pair<uint, uint>> &inds)
             if(_cells[ii*_size + col_id].removePossibleValue(cellVal))
             {
                 inds.push(std::pair<uint, uint>(ii, col_id));
+                set();
             }
         }
         //fix zone for that ind pair
@@ -148,6 +151,7 @@ void SudokuClass::fixRemainingCells(std::queue<std::pair<uint, uint>> &inds)
                 if(_cells[ii*_size + jj].removePossibleValue(cellVal))
                 {
                     inds.push(std::pair<uint, uint>(ii, jj));
+                    set();
                 }
             }
         }
@@ -581,7 +585,9 @@ void SudokuClass::threadPairPossibles(uint id, traversal opt, std::vector<Cell> 
                     for(auto &possibIt:it.first)
                     {
                         if((*cells)[cellInd].removePossibleValue(possibIt))
+                        {
                             inds->push(std::pair<uint, uint>(ii, jj));
+                        }
                     }
                 }
             }
@@ -590,3 +596,17 @@ void SudokuClass::threadPairPossibles(uint id, traversal opt, std::vector<Cell> 
 
 }
 
+void SudokuClass::set()
+{
+    isChanged = true;
+}
+
+void SudokuClass::reset()
+{
+    isChanged = false;
+}
+
+bool SudokuClass::isPuzzleChanged()
+{
+    return isChanged;
+}

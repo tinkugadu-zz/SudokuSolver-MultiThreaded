@@ -26,6 +26,7 @@ class SudokuClass
                 std::queue<std::pair<uint, uint>> *inds);
     SudokuClass() = delete;
     void fixRemainingCells(std::queue<std::pair<uint, uint>> &indices);
+    bool isChanged;
 public:
     SudokuClass(uint size);
     SudokuClass(std::vector<std::vector<uint>> mat);
@@ -40,6 +41,11 @@ public:
     bool validateZones(bool checkComplete=false, int zone= -1);
     void fillUniqueValues(traversal opt);
     void pairPossibles(traversal opt);
+    //sets to true if a cell value is solved
+    void set();
+    //resets Sudoku puzzle to false
+    void reset();
+    bool isPuzzleChanged();
 };
 
 #endif //SUDOKUCLASS_H
