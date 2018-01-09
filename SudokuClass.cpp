@@ -7,7 +7,7 @@
 std::mutex SudokuClass::printMutex; //this mutex is used exclusively to print couts in threads.
 SudokuClass::SudokuClass(uint size): 
         _size(size), _cells(std::vector<Cell>()), _sqSize(0),
-        isChanged(false)
+        isChanged(true), _fixedCells(0)
 {
     if(size == 0)
     {
@@ -27,7 +27,8 @@ SudokuClass::SudokuClass(uint size):
 }
 
 SudokuClass::SudokuClass(std::vector<std::vector<uint>> mat):
-        _size(0), _sqSize(0), _cells(std::vector<Cell>())
+        _size(0), _sqSize(0), _cells(std::vector<Cell>()),
+        isChanged(true), _fixedCells(0)
 {
     uint len = mat.size();
     if(!len)
@@ -109,6 +110,7 @@ void SudokuClass::fillPossibleCells(traversal opt)
 void SudokuClass::fixRemainingCells(std::queue<std::pair<uint, uint>> &inds)
 {
     //iterate through all pairs in queue until it dries out
+    _fixedCells += inds.size();
     while(inds.size())
     {
         auto indPair = inds.front();
@@ -123,6 +125,7 @@ void SudokuClass::fixRemainingCells(std::queue<std::pair<uint, uint>> &inds)
             if(_cells[row_id*_size + jj].removePossibleValue(cellVal))
             {
                 inds.push(std::pair<uint, uint>(row_id, jj));
+                ++_fixedCells;
             }
             set();
         }
@@ -133,6 +136,7 @@ void SudokuClass::fixRemainingCells(std::queue<std::pair<uint, uint>> &inds)
             if(_cells[ii*_size + col_id].removePossibleValue(cellVal))
             {
                 inds.push(std::pair<uint, uint>(ii, col_id));
+                ++_fixedCells;
             }
             set();
         }
@@ -151,6 +155,7 @@ void SudokuClass::fixRemainingCells(std::queue<std::pair<uint, uint>> &inds)
                 if(_cells[ii*_size + jj].removePossibleValue(cellVal))
                 {
                     inds.push(std::pair<uint, uint>(ii, jj));
+                    ++_fixedCells;
                 }
                 set();
             }
@@ -613,3 +618,7 @@ bool SudokuClass::isPuzzleChanged()
     return isChanged;
 }
 
+uint SudokuClass::getTotalFixedCells()
+{
+    return _fixedCells;
+}
