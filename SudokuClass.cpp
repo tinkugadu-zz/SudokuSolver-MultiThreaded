@@ -4,7 +4,7 @@
 
 
 //SudokuClass definitin starts here
-std::mutex SudokuClass::printMutex;
+std::mutex SudokuClass::printMutex; //this mutex is used exclusively to print couts in threads.
 SudokuClass::SudokuClass(uint size): 
         _size(size), _cells(std::vector<Cell>()), _sqSize(0),
         isChanged(false)
