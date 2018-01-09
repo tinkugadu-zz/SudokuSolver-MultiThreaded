@@ -23,4 +23,3 @@ Moved Cell class from SudokuClass to SudokuCell.
 changed compilation script to cmake and deleted make.sh file.
 Usage: Create folder named buid. cd into build directory and type "cmake .."
 This command will compile all cpp files of project and creates an executable 
-
