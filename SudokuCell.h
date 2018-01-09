@@ -20,6 +20,8 @@ class Cell
     uint col_id;
     uint value;
     std::set<uint> possibles;
+    bool autoFillCell();
+
 public:
     Cell(uint row, uint col, uint size);
     Cell(uint row, uint col, uint val, uint size);
@@ -28,6 +30,7 @@ public:
     uint getVal();
     void setVal(uint val);
     bool removePossibleValue(uint val);
+    bool removePossibleValue(std::vector<uint> &vals);
     uint getRowId();
     uint getColId();
     void dump();

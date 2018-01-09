@@ -27,6 +27,7 @@ class SudokuClass
     SudokuClass() = delete;
     void fixRemainingCells(std::queue<std::pair<uint, uint>> &indices);
     bool isChanged;
+    uint _fixedCells;
 public:
     SudokuClass(uint size);
     SudokuClass(std::vector<std::vector<uint>> mat);

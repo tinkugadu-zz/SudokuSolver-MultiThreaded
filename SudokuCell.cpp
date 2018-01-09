@@ -62,24 +62,61 @@ void Cell::setVal(uint val)
 //It means true is returned when only one possible value remains in set.
 bool Cell::removePossibleValue(uint val)
 {
-    if(possibles.size() <= 1) return false;
-    possibles.erase(val);
-    auto retVal = false;
-    //set the value of cell when only one possible value remains
-    if(possibles.size() == 1)
-    {
-        if(!value)
-        {
-            value = *(possibles.begin());
-            possibles.clear();
-            retVal = true;
-        }
-        else {
-            cout<<"Error:This case should not occur"<<endl;
-            //this->printCell();
-        }
+    //check if cell is not solved, if you are solving it.
+    if(!isEmpty())
+    {        
+        cout<<"cell is already filled. this should not happen"<<endl;
+        return false;
     }
-    return retVal;
+    //check if there are nay possibles remaining
+    if(possibles.size() <= 1)
+    {
+        cout<<"invalid state of possible values. This should not occur"<<endl;
+        return false;
+    }
+    possibles.erase(val);
+    return autoFillCell();
+}
+
+bool Cell::removePossibleValue(std::vector<uint> &vals)
+{
+    if(!isEmpty())
+    {
+        cout<<"trying to fill a solved cell."<<endl;
+        return false;
+    }
+    if(possibles.size() <= 1)
+    {
+        cout<<"possible values are not of operating size."<<endl;
+        return false;
+    }
+
+    for(auto &it:vals)
+    {
+        possibles.erase(it);
+    }
+    return autoFillCell();
+}
+
+//This method checks if cell is ready to be solved. 
+//returns true if the cell is resolved.
+//false if nothing changed.
+bool Cell::autoFillCell()
+{
+    if(!possibles.size())
+    {
+        cout<<"Unexpected behavior"<<endl;
+        return false;
+    }
+    if(possibles.size() > 1)
+    {
+        //still more solving needs for this cell so pass.
+        return false;
+    }
+    //if you are here, then cell is about to be filled.
+    value = *(possibles.begin());
+    possibles.clear();
+    return true;
 }
 
 uint Cell::getRowId()

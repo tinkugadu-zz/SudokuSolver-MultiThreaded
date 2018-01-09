@@ -123,8 +123,8 @@ void SudokuClass::fixRemainingCells(std::queue<std::pair<uint, uint>> &inds)
             if(_cells[row_id*_size + jj].removePossibleValue(cellVal))
             {
                 inds.push(std::pair<uint, uint>(row_id, jj));
-                set();
             }
+            set();
         }
         //fix column possibles, traverse through all rows for this column
         for(auto ii=0; ii<_size; ++ii)
@@ -133,8 +133,8 @@ void SudokuClass::fixRemainingCells(std::queue<std::pair<uint, uint>> &inds)
             if(_cells[ii*_size + col_id].removePossibleValue(cellVal))
             {
                 inds.push(std::pair<uint, uint>(ii, col_id));
-                set();
             }
+            set();
         }
         //fix zone for that ind pair
         uint zr = row_id/_sqSize;
@@ -151,8 +151,8 @@ void SudokuClass::fixRemainingCells(std::queue<std::pair<uint, uint>> &inds)
                 if(_cells[ii*_size + jj].removePossibleValue(cellVal))
                 {
                     inds.push(std::pair<uint, uint>(ii, jj));
-                    set();
                 }
+                set();
             }
         }
     }
@@ -388,6 +388,8 @@ void SudokuClass::fillUniqueValues(traversal opt)
     cout<<"unique values filled"<<endl;
 }
 
+//thread which sets the value of cell based on unique values found
+//Sometimes looking at possible values shows that there will be 
 void SudokuClass::threadFillUniqueValues(uint thr_id, traversal opt, std::vector<Cell> *cells, 
             std::queue<std::pair<uint, uint>> *inds)
 {
@@ -580,21 +582,21 @@ void SudokuClass::threadPairPossibles(uint id, traversal opt, std::vector<Cell> 
                 if(std::find(it.second.begin(), it.second.end(), cellInd) == 
                             it.second.end())
                 {
-                 //didnt find this index in indicws vector, so remove possibles from 
+                 //didnt find this index in indices vector, so remove possibles from 
                  //this cellInd
-                    for(auto &possibIt:it.first)
+//                    for(auto &possibIt:it.first)
+//                    {
+                    if((*cells)[cellInd].removePossibleValue(it.first))
                     {
-                        if((*cells)[cellInd].removePossibleValue(possibIt))
-                        {
-                            inds->push(std::pair<uint, uint>(ii, jj));
-                        }
+                        inds->push(std::pair<uint, uint>(ii, jj));
                     }
+//                    }
                 }
             }
         }
     }
 
-}
+}//end of threadPossiblePairs method
 
 void SudokuClass::set()
 {
@@ -610,3 +612,4 @@ bool SudokuClass::isPuzzleChanged()
 {
     return isChanged;
 }
+
