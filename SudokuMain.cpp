@@ -169,7 +169,6 @@ int main(int argc, char* argv[])
     }
     cout<<"Total iterations: "<<iter<<endl;
     mySudoku.dump();
-    cout<<"total cells fixed: "<<mySudoku.getTotalFixedCells()<<endl;
     return 0;
 }
 

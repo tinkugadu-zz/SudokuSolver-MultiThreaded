@@ -370,6 +370,7 @@ void SudokuClass::dump()
     {
         it.dump();
     }
+    cout<<"Total cells fixed: "<<_fixedCells<<endl;
 }
 
 void SudokuClass::fillUniqueValues(traversal opt)
